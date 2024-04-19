@@ -16,16 +16,18 @@ ARG DEV=false
 #Using a venv because there might still be some conflicting dependencies with the base image
 RUN python -m venv /py && \ 
     /py/bin/pip install --upgrade pip
-RUN apk add --update --no-cache postgresql-client && \
-    #virtual dependencies .tmp-build-deps
-    apk add --update --no-cache --virtual .tmp-build-deps \
-    build-base postgresql-dev musl-dev 
-#gcc libc-dev linux-headers postgresql-dev && \
+RUN apk add --update --no-cache postgresql-client
+#apk add postgresql-dev \
+#virtual dependencies .tmp-build-deps
+RUN apk add --update --no-cache --virtual .tmp-build-deps
+RUN build-base postgresql-dev musl-dev 
+#RUN gcc libc-dev linux-headers postgresql-dev
 RUN /py/bin/pip install -r /tmp/requirements.txt
 #small if shell script
-RUN if [ $DEV = "true" ] ; \
+RUN if [ $DEV = "true" ]; \
     then echo "--DEV BUILD--" && /py/bin/pip install -r /tmp/requirements.dev.txt ; \
     fi 
+
 #end of shell script
 RUN apk del .tmp-build-deps
 #requirements is not used after build so it is removed
