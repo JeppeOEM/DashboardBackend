@@ -37,15 +37,3 @@ services:
 
 volumes:
   dev-db-data:   
-#create new django project
-#docker-compose run --rm app sh -c "django-admin startproject app ."
-
-#lint (start from buttom up, dont affect line number)
-# docker-compose run --rm app sh -c "flake8"
-# docker-compose run --rm app sh -c "python manage.py test"
-#create new app
-# docker-compose run --rm app sh -c "python manage.py startapp NAMEHERE"
-
-# docker-compose build (just building via docker compose)
-
-# psycopg2 IS BEING COMPILED when run with pip based on operating system
