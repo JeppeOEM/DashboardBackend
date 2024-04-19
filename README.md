@@ -34,3 +34,7 @@ if need to delete volume then go docker-compose down and then docker volume ls +
 
 docker-compose run --rm app sh -c "python manage.py createsuperuser"
 
+## Check auth / enable auth in browser
+
+Create token in swagger and click authorize
+Write: Token KEY
