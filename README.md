@@ -21,3 +21,10 @@ when create a new app add it to the main project app settings.py file under INST
 
 ## Commands
 Management -> commands folder structure to create commands
+
+## Migrations
+
+docker-compose run --rm app sh -c "python manage.py makemigrations"
+docker-compose run --rm app sh -c "python manage.py wait_for_db && python manage.py migrate"
+
+if need to delete volume then go docker-compose down and then docker volume ls + docker volume rm
