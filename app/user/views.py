@@ -1,12 +1,10 @@
 """
 Views for the user API.
 """
-from user.serializers import UserSerializer
-from rest_framework import generics
-from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.settings import api_settings
-from rest_framework import generics
+# from user.serializers import UserSerializer
 from rest_framework import generics, authentication, permissions
+from rest_framework.settings import api_settings
+from rest_framework.authtoken.views import ObtainAuthToken
 
 #CreateApiView handles a post http request designed for creating objects
 # It just need to be inherited by a Seiralizer
