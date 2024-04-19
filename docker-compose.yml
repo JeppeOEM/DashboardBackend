@@ -15,7 +15,9 @@ services:
       - ./app:/app
       #if no command is specified in docker compose run it will use this command specified in "command"
     command: >
-      sh -c "python manage.py runserver 0.0.0.0:8000"
+      sh -c "python manage.py wait_for_db &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
     environment:
     #because using docker compose it is possible to use the name of the servie as the hostname
       - DB_HOST=db
