@@ -16,12 +16,36 @@ services:
       #if no command is specified in docker compose run it will use this command specified in "command"
     command: >
       sh -c "python manage.py runserver 0.0.0.0:8000"
-      
+    environment:
+    #because using docker compose it is possible to use the name of the servie as the hostname
+      - DB_HOST=db
+      - DB_NAME=devdb
+      - DB_USER=devuser
+      - DB_PASS=changeme
+    #wait for db service to start before app runs
+    depends_on:
+      - db #only ensures db is started not that postgres is running and ready
+
+  db:
+    image: postgres:13-alpine
+    volumes:
+      - dev-db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=devdb
+      - POSTGRES_USER=devuser
+      - POSTGRES_PASSWORD=changeme
+
+volumes:
+  dev-db-data:   
 #create new django project
 #docker-compose run --rm app sh -c "django-admin startproject app ."
 
 #lint (start from buttom up, dont affect line number)
 # docker-compose run --rm app sh -c "flake8"
 # docker-compose run --rm app sh -c "python manage.py test"
+#create new app
+# docker-compose run --rm app sh -c "python manage.py startapp NAMEHERE"
 
 # docker-compose build (just building via docker compose)
+
+# psycopg2 IS BEING COMPILED when run with pip based on operating system
