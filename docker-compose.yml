@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+
+  app:
+    build:
+    #build in current directory where are running docker compose from
+      context: .
+      args:
+        - DEV=true
+    ports:
+      - "8000:8000"
+    volumes:
+    #sync code
+      - ./app:/app
+      #if no command is specified in docker compose run it will use this command specified in "command"
+    command: >
+      sh -c "python manage.py runserver 0.0.0.0:8000"
+      
+#create new django project
+#docker-compose run --rm app sh -c "django-admin startproject app ."
+
+#lint (start from buttom up, dont affect line number)
+# docker-compose run --rm app sh -c "flake8"
+# docker-compose run --rm app sh -c "python manage.py test"
+
+# docker-compose build (just building via docker compose)
