@@ -20,6 +20,7 @@ class TagSerializer(serializers.ModelSerializer):
 class StrategySerializer(serializers.ModelSerializer):
     """Serializer for Strategy. Excludes some values which can only be seen with the detailed StrategyDetailedSerializer """
 #rest_framework syntax to define class with
+    tags = TagSerializer(many=True, required=False)
     class Meta:
         model = Recipe
         fields = ['id', 'title', 'time_minutes', 'price', 'link', 'tags']
