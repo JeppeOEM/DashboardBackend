@@ -1,23 +1,30 @@
 """
 Views for the recipe APIs
 """
-from rest_framework import viewsets
+
+from rest_framework import (
+    viewsets,
+    mixins,
+)
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
-# Create your views here.
-from core.models import Recipe
+from core.models import (
+    Recipe,
+    Tag,
+)
 from strategy import serializers
 
-
+#ModelViewSet comes with basic CRUD operations
 class RecipeViewSet(viewsets.ModelViewSet):
     """View for manage recipe APIs."""
     # serializer_class = serializers.StrategySerializer
+    #### take care of typos here
     serializer_class = serializers.StrategyDetailSerializer
     queryset = Recipe.objects.all()
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-
+    ####
     #overwriting get_querset method
     def get_queryset(self):
         """Retrieve recipes for authenticated user."""
@@ -47,3 +54,23 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """Create a new recipe."""
 
         serializer.save(user=self.request.user)
+
+
+#Listing function
+#viewsets.GenericViewSet MUST be last, as it can overwrite
+class TagViewSet(mixins.DestroyModelMixin,
+                 mixins.UpdateModelMixin,
+                 mixins.ListModelMixin,
+                 viewsets.GenericViewSet):
+    """Manage tags in the database."""
+    serializer_class = serializers.TagSerializer
+    ##### Naming of these variables is not arbitrary it can cause bugs dont the line if there is typos
+    queryset = Tag.objects.all()
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    #####
+
+    ### Overwriting method
+    def get_queryset(self):
+        """Filter queryset to authenticated user."""
+        return self.queryset.filter(user=self.request.user).order_by('-name')

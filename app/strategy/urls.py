@@ -14,6 +14,7 @@ from strategy import views
 router = DefaultRouter()
 #auto generated endpoints from the view
 router.register('strategies', views.RecipeViewSet)
+router.register('tags', views.TagViewSet)
 
 app_name = 'strategy'
 

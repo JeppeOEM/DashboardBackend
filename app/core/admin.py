@@ -56,3 +56,4 @@ class UserAdmin(BaseUserAdmin):
 # And would not display any of the changes in made in this class
 admin.site.register(models.User, UserAdmin)
 admin.site.register(models.Recipe)
+admin.site.register(models.Tag)
