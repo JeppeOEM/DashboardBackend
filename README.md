@@ -1,18 +1,17 @@
-app is the name of the service here
+(app is the name of the project)
 
+# create new django project
+docker-compose run --rm app sh -c "django-admin startproject app ."
+
+# lint + test (start from buttom up, dont affect line number)
+docker-compose run --rm app sh -c "flake8"
 docker-compose run --rm app sh -c "python manage.py test"
+# create new PROJECT
+docker-compose run --rm app sh -c "python manage.py startproject NAMEHERE ."
 
-#create new django project
-#docker-compose run --rm app sh -c "django-admin startproject app ."
+# create new app
+docker-compose run --rm app sh -c "python manage.py startapp strategy"
 
-#lint (start from buttom up, dont affect line number)
-# docker-compose run --rm app sh -c "flake8"
-# docker-compose run --rm app sh -c "python manage.py test"
-#create new PROJECT
-# docker-compose run --rm app sh -c "python manage.py startproject NAMEHERE ."
-
-#create new app
-# docker-compose run --rm app sh -c "python manage.py startapp NAMEHERE"
 when create a new app add it to the main project app settings.py file under INSTALLED_APPS by simply writing the name of folder
 
 # docker-compose build (just building via docker compose)

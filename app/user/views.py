@@ -10,7 +10,12 @@ class CreateUserView(generics.CreateAPIView):
     """Create a new user in the system."""
     serializer_class = UserSerializer
 class CreateTokenView(ObtainAuthToken):
-    """Create a new auth token for user."""
+    """Create a new auth token for a user.
+      Remember to put the correct email and password´from a existing user
+      Now you can login in under the Autorize button like this(no""):
+      Token AUTH_STRING
+      """
+
     serializer_class = AuthTokenSerializer
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
 

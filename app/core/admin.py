@@ -55,3 +55,4 @@ class UserAdmin(BaseUserAdmin):
 #UserAdmin is optional if left it will use default admin model manager
 # And would not display any of the changes in made in this class
 admin.site.register(models.User, UserAdmin)
+admin.site.register(models.Recipe)
