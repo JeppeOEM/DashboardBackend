@@ -86,3 +86,14 @@ class ModelTests(TestCase):
         )
 
         self.assertEqual(str(ingredient), ingredient.name)
+
+
+    def test_create_dashboard(self):
+        """Test creating an dashboard grid config."""
+        user = create_user()
+        dashboard = models.Dashboard.objects.create(
+            user=user,
+            gridConfig='Some string'
+        )
+
+        self.assertEqual(str(dashboard), dashboard.gridConfig)

@@ -26,7 +26,6 @@ class StrategySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ['id', 'title', 'time_minutes', 'price', 'link', 'tags']
         fields = [
             'id', 'title', 'time_minutes', 'price', 'link', 'tags',
             'ingredients',
@@ -89,6 +88,7 @@ class StrategySerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         return instance
+
 class StrategyDetailSerializer(StrategySerializer):
     """Serializer for recipe detail view."""
     class Meta(StrategySerializer.Meta):

@@ -9,6 +9,19 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 
+class Dashboard(models.Model):
+    """Ingredient for recipes."""
+    gridConfig = models.TextField()
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    tags = models.ManyToManyField('Tag')
+    description = models.TextField(null=True)
+    def __str__(self):
+        return self.user
+
+
 class Ingredient(models.Model):
     """Ingredient for recipes."""
     name = models.CharField(max_length=255)
@@ -16,7 +29,7 @@ class Ingredient(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
-
+    description = models.TextField(null=True)
     def __str__(self):
         return self.name
 
