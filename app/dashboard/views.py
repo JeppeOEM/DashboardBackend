@@ -1,5 +1,5 @@
 """
-Views for the recipe APIs
+Views for the strategy APIs
 """
 
 from rest_framework import (
@@ -16,7 +16,7 @@ from core.models import (
 from dashboard import serializers
 #ModelViewSet comes with basic CRUD operations
 class DashboardViewSet(viewsets.ModelViewSet):
-    """View for manage recipe APIs."""
+    """View for manage strategy APIs."""
     # serializer_class = serializers.StrategySerializer
     #### take care of typos here
     serializer_class = serializers.DashboardDetailSerializer
@@ -26,7 +26,7 @@ class DashboardViewSet(viewsets.ModelViewSet):
     ####
     #overwriting get_querset method
     def get_queryset(self):
-        """Retrieve recipes for authenticated user."""
+        """Retrieve strategys for authenticated user."""
         return self.queryset.filter(user=self.request.user).order_by('-id')
 
     #get_serializer_class
@@ -50,7 +50,7 @@ class DashboardViewSet(viewsets.ModelViewSet):
     #When we call create on the ViewSet, we can call this method as part of the creation of that new object
     #The Validation Serializer is passed so we are Authenticated and are allowed to create new objects
     def perform_create(self, serializer):
-        """Create a new recipe."""
+        """Create a new strategy."""
 
         serializer.save(user=self.request.user)
 
@@ -58,11 +58,11 @@ class DashboardViewSet(viewsets.ModelViewSet):
 
 #viewsets.GenericViewSet MUST be last, as it can overwrite
 
-class BaseRecipeAttrViewSet(mixins.DestroyModelMixin,
+class BaseStrategyAttrViewSet(mixins.DestroyModelMixin,
                             mixins.UpdateModelMixin,
                             mixins.ListModelMixin,
                             viewsets.GenericViewSet):
-    """Base viewset for recipe attributes."""
+    """Base viewset for strategy attributes."""
     """Manage tags in the database."""
     # serializer_class = serializers.TagSerializer
     ##### Naming of these variables is not arbitrary it can cause bugs dont the line if there is typos
@@ -77,7 +77,7 @@ class BaseRecipeAttrViewSet(mixins.DestroyModelMixin,
         return self.queryset.filter(user=self.request.user).order_by('-name')
 
 
-class TagViewSet(BaseRecipeAttrViewSet):
+class TagViewSet(BaseStrategyAttrViewSet):
     """Manage tags in the database."""
     serializer_class = serializers.TagSerializer
     queryset = Tag.objects.all()

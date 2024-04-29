@@ -1,5 +1,5 @@
 """
-URL mappings for the recipe app.
+URL mappings for the strategy app.
 """
 from django.urls import (
     path,

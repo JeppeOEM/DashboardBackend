@@ -1,9 +1,9 @@
 """
-Serializers for recipe APIs
+Serializers for strategy APIs
 """
 from rest_framework import serializers
 from core.models import (
-    Recipe,
+    Strategy,
     Tag,
     Ingredient,
 )
@@ -20,19 +20,19 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
         read_only_fields = ['id']
 class StrategySerializer(serializers.ModelSerializer):
-    """Serializer for recipes."""
+    """Serializer for strategys."""
     tags = TagSerializer(many=True, required=False)
     ingredients = IngredientSerializer(many=True, required=False)
 
     class Meta:
-        model = Recipe
+        model = Strategy
         fields = [
             'id', 'title', 'time_minutes', 'price', 'link', 'tags',
             'ingredients',
         ]
         read_only_fields = ['id']
 
-    def _get_or_create_tags(self, tags, recipe):
+    def _get_or_create_tags(self, tags, strategy):
         """Handle getting or creating tags as needed."""
         auth_user = self.context['request'].user
         for tag in tags:
@@ -40,9 +40,9 @@ class StrategySerializer(serializers.ModelSerializer):
                 user=auth_user,
                 **tag,
             )
-            recipe.tags.add(tag_obj)
+            strategy.tags.add(tag_obj)
 
-    def _get_or_create_ingredients(self, ingredients, recipe):
+    def _get_or_create_ingredients(self, ingredients, strategy):
         """Handle getting or creating ingredients as needed."""
         auth_user = self.context['request'].user
         for ingredient in ingredients:
@@ -50,20 +50,20 @@ class StrategySerializer(serializers.ModelSerializer):
                 user=auth_user,
                 **ingredient,
             )
-            recipe.ingredients.add(ingredient_obj)
+            strategy.ingredients.add(ingredient_obj)
 
     def create(self, validated_data):
-        """Create a recipe."""
+        """Create a strategy."""
         tags = validated_data.pop('tags', [])
         ingredients = validated_data.pop('ingredients', [])
-        recipe = Recipe.objects.create(**validated_data)
-        self._get_or_create_tags(tags, recipe)
-        self._get_or_create_ingredients(ingredients, recipe)
+        strategy = Strategy.objects.create(**validated_data)
+        self._get_or_create_tags(tags, strategy)
+        self._get_or_create_ingredients(ingredients, strategy)
 
-        return recipe
+        return strategy
 
     # def update(self, instance, validated_data):
-    #     """Update recipe."""
+    #     """Update strategy."""
     #     tags = validated_data.pop('tags', None)
     #     if tags is not None:
     #         instance.tags.clear()
@@ -74,7 +74,7 @@ class StrategySerializer(serializers.ModelSerializer):
     #     return instance
 
     def update(self, instance, validated_data):
-        """Update recipe."""
+        """Update strategy."""
         tags = validated_data.pop('tags', None)
         ingredients = validated_data.pop('ingredients', None)
         if tags is not None:
@@ -90,6 +90,6 @@ class StrategySerializer(serializers.ModelSerializer):
         return instance
 
 class StrategyDetailSerializer(StrategySerializer):
-    """Serializer for recipe detail view."""
+    """Serializer for strategy detail view."""
     class Meta(StrategySerializer.Meta):
         fields = StrategySerializer.Meta.fields + ['description']

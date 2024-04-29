@@ -8,7 +8,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
 
-
+#get url from the name of the view
 CREATE_USER_URL = reverse('user:create')
 TOKEN_URL = reverse('user:token')
 ME_URL = reverse('user:me')

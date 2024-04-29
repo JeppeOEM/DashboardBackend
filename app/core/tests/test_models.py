@@ -54,21 +54,21 @@ class ModelTests(TestCase):
         #is_staff allows you to login
         self.assertTrue(user.is_staff)
 
-    def test_create_recipe(self):
-        """Test creating a recipe is successful."""
+    def test_create_strategy(self):
+        """Test creating a strategy is successful."""
         user = get_user_model().objects.create_user(
             'test@example.com',
             'testpass123',
         )
-        recipe = models.Recipe.objects.create(
+        strategy = models.Strategy.objects.create(
             user=user,
-            title='Sample recipe name',
+            title='Sample strategy name',
             time_minutes=5,
             price=Decimal('5.50'),
             description='Sample receipe description.',
         )
 
-        self.assertEqual(str(recipe), recipe.title)
+        self.assertEqual(str(strategy), strategy.title)
 
     def test_create_tag(self):
         """Test creating a tag is successful."""

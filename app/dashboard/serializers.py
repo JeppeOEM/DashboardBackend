@@ -13,7 +13,7 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
         read_only_fields = ['id']
 class DashboardSerializer(serializers.ModelSerializer):
-    """Serializer for recipes."""
+    """Serializer for strategys."""
     tags = TagSerializer(many=True, required=False)
 
     class Meta:

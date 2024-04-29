@@ -10,7 +10,7 @@ from django.contrib.auth.models import (
 )
 
 class Dashboard(models.Model):
-    """Ingredient for recipes."""
+    """Ingredient for strategys."""
     gridConfig = models.TextField()
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -23,7 +23,7 @@ class Dashboard(models.Model):
 
 
 class Ingredient(models.Model):
-    """Ingredient for recipes."""
+    """Ingredient for strategys."""
     name = models.CharField(max_length=255)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -66,8 +66,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
 
-class Recipe(models.Model):
-    """Recipe object."""
+class Strategy(models.Model):
+    """Strategy object."""
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -85,7 +85,7 @@ class Recipe(models.Model):
 
 
 class Tag(models.Model):
-    """Tag for filtering recipes."""
+    """Tag for filtering strategys."""
     name = models.CharField(max_length=255)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
