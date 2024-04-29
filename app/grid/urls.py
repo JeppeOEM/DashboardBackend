@@ -1,4 +1,6 @@
-
+"""
+URL mappings for the strategy app.
+"""
 from django.urls import (
     path,
     include,
@@ -6,14 +8,14 @@ from django.urls import (
 
 from rest_framework.routers import DefaultRouter
 
-from dashboard import views
+from grid import views
 
 
 router = DefaultRouter()
 #auto generated endpoints from the view
-router.register('dashboards', views.DashboardViewSet)
+router.register('grids', views.GridViewSet)
 
-app_name = 'dashboard'
+app_name = 'grid'
 
 urlpatterns = [
     #include the generated urls

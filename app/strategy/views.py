@@ -26,7 +26,7 @@ class StrategyViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     ####
-    #overwriting get_querset method
+    #overwriting get_queryset method
     def get_queryset(self):
         """Retrieve strategies for authenticated user."""
         return self.queryset.filter(user=self.request.user).order_by('-id')

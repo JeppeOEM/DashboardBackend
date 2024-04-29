@@ -10,6 +10,7 @@ from rest_framework import serializers
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for the user object."""
+            #"model" tells what model to use and and "fields" what fields to serialize
     class Meta:
         model = get_user_model()
         fields = ['email', 'password', 'name']

@@ -9,29 +9,9 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 
-class Dashboard(models.Model):
-    """Ingredient for strategies."""
-    gridConfig = models.TextField()
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-    )
-    tags = models.ManyToManyField('Tag')
-    description = models.TextField(blank=True)
-    def __str__(self):
-        return self.gridConfig
 
 
-class Ingredient(models.Model):
-    """Ingredient for strategies."""
-    name = models.CharField(max_length=255)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-    )
-    description = models.TextField(null=True)
-    def __str__(self):
-        return self.name
+
 
 class UserManager(BaseUserManager):
     """Manager for users."""
@@ -83,6 +63,32 @@ class Strategy(models.Model):
     def __str__(self):
         return self.title
 
+class Grid(models.Model):
+    """Ingredient for strategies."""
+    gridConfig = models.TextField()
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    description = models.TextField()
+    # description = models.TextField(blank=True)
+    def __str__(self):
+        return self.gridConfig
+
+
+class Dashboard(models.Model):
+    """Ingredient for strategies."""
+    gridConfig = models.TextField()
+    gridConfig2 = models.TextField()
+    gridConfig3 = models.TextField()
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    description = models.TextField()
+    # description = models.TextField(blank=True)
+    def __str__(self):
+        return self.gridConfig
 
 class Tag(models.Model):
     """Tag for filtering strategies."""
@@ -92,5 +98,15 @@ class Tag(models.Model):
         on_delete=models.CASCADE,
     )
 
+    def __str__(self):
+        return self.name
+
+class Ingredient(models.Model):
+    """Ingredient for strategies."""
+    name = models.CharField(max_length=255)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
     def __str__(self):
         return self.name
