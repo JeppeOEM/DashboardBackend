@@ -78,20 +78,20 @@ class PrivateStrategyApiTests(TestCase):
         self.user = create_user(email='user@example.com', password='test123')
         self.client.force_authenticate(self.user)
 
-    def test_retrieve_strategys(self):
-        """Test retrieving a list of strategys."""
+    def test_retrieve_strategies(self):
+        """Test retrieving a list of strategies."""
         create_strategy(user=self.user)
         create_strategy(user=self.user)
 
         res = self.client.get(STRATEGY_URL)
 
-        strategys = Strategy.objects.all().order_by('-id')
-        serializer = StrategySerializer(strategys, many=True)
+        strategies = Strategy.objects.all().order_by('-id')
+        serializer = StrategySerializer(strategies, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
 
     def test_strategy_list_limited_to_user(self):
-        """Test list of strategys is limited to authenticated user."""
+        """Test list of strategies is limited to authenticated user."""
         # other_user = get_user_model().objects.create_user(
         #     'other@example.com',
         #     'password123',
@@ -102,8 +102,8 @@ class PrivateStrategyApiTests(TestCase):
 
         res = self.client.get(STRATEGY_URL)
 
-        strategys = Strategy.objects.filter(user=self.user)
-        serializer = StrategySerializer(strategys, many=True)
+        strategies = Strategy.objects.filter(user=self.user)
+        serializer = StrategySerializer(strategies, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
 
@@ -224,9 +224,9 @@ class PrivateStrategyApiTests(TestCase):
         res = self.client.post(STRATEGY_URL, payload, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        strategys = Strategy.objects.filter(user=self.user)
-        self.assertEqual(strategys.count(), 1)
-        strategy = strategys[0]
+        strategies = Strategy.objects.filter(user=self.user)
+        self.assertEqual(strategies.count(), 1)
+        strategy = strategies[0]
         self.assertEqual(strategy.tags.count(), 2)
         for tag in payload['tags']:
             exists = strategy.tags.filter(
@@ -248,9 +248,9 @@ class PrivateStrategyApiTests(TestCase):
         res = self.client.post(STRATEGY_URL, payload, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        strategys = Strategy.objects.filter(user=self.user)
-        self.assertEqual(strategys.count(), 1)
-        strategy = strategys[0]
+        strategies = Strategy.objects.filter(user=self.user)
+        self.assertEqual(strategies.count(), 1)
+        strategy = strategies[0]
         self.assertEqual(strategy.tags.count(), 2)
         self.assertIn(tag_indian, strategy.tags.all())
         for tag in payload['tags']:
@@ -289,7 +289,7 @@ class PrivateStrategyApiTests(TestCase):
         self.assertNotIn(tag_breakfast, strategy.tags.all())
 
     def test_clear_strategy_tags(self):
-        """Test clearing a strategys tags."""
+        """Test clearing a strategies tags."""
         tag = Tag.objects.create(user=self.user, name='Dessert')
         strategy = create_strategy(user=self.user)
         strategy.tags.add(tag)
@@ -315,9 +315,9 @@ class PrivateStrategyApiTests(TestCase):
         res = self.client.post(STRATEGY_URL, payload, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        strategys = Strategy.objects.filter(user=self.user)
-        self.assertEqual(strategys.count(), 1)
-        strategy = strategys[0]
+        strategies = Strategy.objects.filter(user=self.user)
+        self.assertEqual(strategies.count(), 1)
+        strategy = strategies[0]
         self.assertEqual(strategy.ingredients.count(), 2)
         for ingredient in payload['ingredients']:
             exists = strategy.ingredients.filter(
@@ -338,9 +338,9 @@ class PrivateStrategyApiTests(TestCase):
         res = self.client.post(STRATEGY_URL, payload, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        strategys = Strategy.objects.filter(user=self.user)
-        self.assertEqual(strategys.count(), 1)
-        strategy = strategys[0]
+        strategies = Strategy.objects.filter(user=self.user)
+        self.assertEqual(strategies.count(), 1)
+        strategy = strategies[0]
         self.assertEqual(strategy.ingredients.count(), 2)
         self.assertIn(ingredient, strategy.ingredients.all())
         for ingredient in payload['ingredients']:
@@ -378,7 +378,7 @@ class PrivateStrategyApiTests(TestCase):
         self.assertNotIn(ingredient1, strategy.ingredients.all())
 
     def test_clear_strategy_ingredients(self):
-        """Test clearing a strategys ingredients."""
+        """Test clearing a strategies ingredients."""
         ingredient = Ingredient.objects.create(user=self.user, name='Garlic')
         strategy = create_strategy(user=self.user)
         strategy.ingredients.add(ingredient)
@@ -448,23 +448,23 @@ class PrivateStrategyApiTests(TestCase):
 #         self.client = APIClient()
 #         self.user = create_user(email='user@example.com', password='test123')
 #         self.client.force_authenticate(self.user)
-#     def test_retrieve_strategys(self):
-#         """Test retrieving a list of strategys."""
+#     def test_retrieve_strategies(self):
+#         """Test retrieving a list of strategies."""
 #         create_strategy(user=self.user)
 #         create_strategy(user=self.user)
 #         res = self.client.get(STRATEGY_URL)
-#         strategys = Strategy.objects.all().order_by('-id')
-#         serializer = StrategySerializer(strategys, many=True)
+#         strategies = Strategy.objects.all().order_by('-id')
+#         serializer = StrategySerializer(strategies, many=True)
 #         self.assertEqual(res.status_code, status.HTTP_200_OK)
 #         self.assertEqual(res.data, serializer.data)
 #     def test_strategy_list_limited_to_user(self):
-#         """Test list of strategys is limited to authenticated user."""
+#         """Test list of strategies is limited to authenticated user."""
 #         other_user = create_user(email='other@example.com', password='test123')
 #         create_strategy(user=other_user)
 #         create_strategy(user=self.user)
 #         res = self.client.get(STRATEGY_URL)
-#         strategys = Strategy.objects.filter(user=self.user)
-#         serializer = StrategySerializer(strategys, many=True)
+#         strategies = Strategy.objects.filter(user=self.user)
+#         serializer = StrategySerializer(strategies, many=True)
 #         self.assertEqual(res.status_code, status.HTTP_200_OK)
 #         self.assertEqual(res.data, serializer.data)
 #     def test_get_strategy_detail(self):
@@ -562,9 +562,9 @@ class PrivateStrategyApiTests(TestCase):
 #         res = self.client.post(STRATEGY_URL, payload, format='json')
 
 #         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-#         strategys = Strategy.objects.filter(user=self.user)
-#         self.assertEqual(strategys.count(), 1)
-#         strategy = strategys[0]
+#         strategies = Strategy.objects.filter(user=self.user)
+#         self.assertEqual(strategies.count(), 1)
+#         strategy = strategies[0]
 #         self.assertEqual(strategy.tags.count(), 2)
 #         for tag in payload['tags']:
 #             exists = strategy.tags.filter(
@@ -585,9 +585,9 @@ class PrivateStrategyApiTests(TestCase):
 #         res = self.client.post(STRATEGY_URL, payload, format='json')
 
 #         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-#         strategys = Strategy.objects.filter(user=self.user)
-#         self.assertEqual(strategys.count(), 1)
-#         strategy = strategys[0]
+#         strategies = Strategy.objects.filter(user=self.user)
+#         self.assertEqual(strategies.count(), 1)
+#         strategy = strategies[0]
 #         self.assertEqual(strategy.tags.count(), 2)
 #         self.assertIn(tag_indian, strategy.tags.all())
 #         for tag in payload['tags']:

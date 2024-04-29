@@ -20,7 +20,7 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
         read_only_fields = ['id']
 class StrategySerializer(serializers.ModelSerializer):
-    """Serializer for strategys."""
+    """Serializer for strategies."""
     tags = TagSerializer(many=True, required=False)
     ingredients = IngredientSerializer(many=True, required=False)
 

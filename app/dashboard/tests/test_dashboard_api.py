@@ -1,6 +1,6 @@
 
 """
-Tests for strategy APIs.
+Tests for dashboard APIs.
 """
 from decimal import Decimal
 
@@ -9,43 +9,46 @@ from django.test import TestCase
 from django.urls import reverse
 
 from rest_framework import status
+#The APIClient class supports the same request interface as Django's standard Client class.
+#This means that the standard .get(), .post(), .put(), .patch(), .delete(), .head() and .options() methods are all available.
 from rest_framework.test import APIClient
+
 
 from core.models import (
     Ingredient,
-    Strategy,
+    Dashboard,
     Tag,
 )
 
 
-from strategy.serializers import (
-    StrategySerializer,
-    StrategyDetailSerializer,
+from dashboard.serializers import (
+    DashboardSerializer,
+    DashboardDetailSerializer,
 )
 #get url from the name of the view
-#Because the urls for strategy is generated with DefaultRouter
-#strategy-list reverses to strategy/strategies
-#it would be possible to do strategy-detail for id single value based endpoint
-STRATEGY_URL = reverse('strategy:strategy-list')
+#Because the urls for dashboard is generated with DefaultRouter
+#dashboard-list reverses to dashboard/dashbords
+#it would be possible to do dastboard-detail for id single value based endpoint
+DASHBOARD_URL = reverse('dashboard:dashboard-list')
 
-def detail_url(strategy_id):
-    """Create and return a strategy detail URL."""
-    return reverse('strategy:strategy-detail', args=[strategy_id])
+def detail_url(dashboard_id):
+    #url generated from view
+    """Create and return a dashboard detail URL."""
+    return reverse('dashboard:dashboard-detail', args=[dashboard_id])
 
 
-def create_strategy(user, **params):
-    """Create and return a sample strategy."""
+def create_dashboard(user, **params):
+    """Create and return a sample dashboard."""
     defaults = {
-        'title': 'Sample strategy title',
-        'time_minutes': 22,
-        'price': Decimal('5.25'),
+        'gridConfig': 'string',
         'description': 'Sample description',
-        'link': 'http://example.com/strategy.pdf',
+
     }
     defaults.update(params)
 
-    strategy = Strategy.objects.create(user=user, **defaults)
-    return strategy
+    dashboard = Dashboard.objects.create(user=user, **defaults)
+    return dashboard
+
 
 def create_user(**params):
     """Create and return a new user."""
@@ -53,7 +56,7 @@ def create_user(**params):
 
 
 
-class PublicStrategyAPITests(TestCase):
+class PublicDashboardAPITests(TestCase):
     """Test unauthenticated API requests."""
 
     def setUp(self):
@@ -61,12 +64,12 @@ class PublicStrategyAPITests(TestCase):
 
     def test_auth_required(self):
         """Test auth is required to call API."""
-        res = self.client.get(STRATEGY_URL)
+        res = self.client.get(DASHBOARD_URL)
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
-class PrivateStrategyApiTests(TestCase):
+class PrivatedashboardApiTests(TestCase):
     """Test authenticated API requests."""
 
     def setUp(self):
@@ -78,317 +81,314 @@ class PrivateStrategyApiTests(TestCase):
         self.user = create_user(email='user@example.com', password='test123')
         self.client.force_authenticate(self.user)
 
-    def test_retrieve_strategys(self):
-        """Test retrieving a list of strategys."""
-        create_strategy(user=self.user)
-        create_strategy(user=self.user)
+    def test_retrieve_strategies(self):
+        """Test retrieving a list of dashboards."""
+        create_dashboard(user=self.user)
+        create_dashboard(user=self.user)
 
-        res = self.client.get(STRATEGY_URL)
+        res = self.client.get(DASHBOARD_URL)
 
-        strategys = Strategy.objects.all().order_by('-id')
-        serializer = StrategySerializer(strategys, many=True)
+        strategies = Dashboard.objects.all().order_by('-id')
+        serializer = DashboardSerializer(strategies, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
 
-    def test_strategy_list_limited_to_user(self):
-        """Test list of strategys is limited to authenticated user."""
+    def test_dashboard_list_limited_to_user(self):
+        """Only returns the dashboard from the authenticated user."""
         # other_user = get_user_model().objects.create_user(
         #     'other@example.com',
         #     'password123',
         # )
         other_user = create_user(email='other@example.com', password='test123')
-        create_strategy(user=other_user)
-        create_strategy(user=self.user)
+        create_dashboard(user=other_user)
+        create_dashboard(user=self.user)
 
-        res = self.client.get(STRATEGY_URL)
-
-        strategys = Strategy.objects.filter(user=self.user)
-        serializer = StrategySerializer(strategys, many=True)
+        res = self.client.get(DASHBOARD_URL)
+        #finds strategies from authenticated user
+        strategies = Dashboard.objects.filter(user=self.user)
+        serializer = DashboardSerializer(strategies, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
 
-    def test_get_strategy_detail(self):
-        """Test get strategy detail."""
-        strategy = create_strategy(user=self.user)
+    def test_get_dashboard_detail(self):
+        """Test get dashboard detail."""
+        dashboard = create_dashboard(user=self.user)
 
-        url = detail_url(strategy.id)
+        url = detail_url(dashboard.id)
         res = self.client.get(url)
 
-        serializer = StrategyDetailSerializer(strategy)
+        serializer = DashboardDetailSerializer(dashboard)
         self.assertEqual(res.data, serializer.data)
 
-    def test_create_strategy(self):
-        """Test creating a strategy."""
+    def test_create_dashboard(self):
+        """Test creating a dashboard."""
         payload = {
-            'title': 'Sample strategy',
-            'time_minutes': 30,
-            'price': Decimal('5.99'),
+            'gridConfig': 'string',
+            'description': "string"
         }
-        res = self.client.post(STRATEGY_URL, payload)
-
+        res = self.client.post(DASHBOARD_URL, payload)
+        print(res,"res")
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        strategy = Strategy.objects.get(id=res.data['id'])
+        dashboard = Dashboard.objects.get(id=res.data['id'])
         #getattr allows us to get attribute using a variable attribute name
         #https://docs.python.org/3/library/functions.html#getattr
         for k, v in payload.items():
-            self.assertEqual(getattr(strategy, k), v)
-        self.assertEqual(strategy.user, self.user)
+            self.assertEqual(getattr(dashboard, k), v)
+            print(getattr(dashboard, k), v)
+        self.assertEqual(dashboard.user, self.user)
 
 
-    def test_partial_update(self):
-        """Test partial update of a strategy."""
-        original_link = 'https://example.com/strategy.pdf'
-        strategy = create_strategy(
-            user=self.user,
-            title='Sample strategy title',
-            link=original_link,
-        )
+#     def test_partial_update(self):
+#         """Test partial update of a dashboard."""
+#         original_link = 'https://example.com/dashboard.pdf'
+#         dashboard = create_dashboard(
+#             user=self.user,
+#             title='Sample dashboard title',
+#             link=original_link,
+#         )
 
-        payload = {'title': 'New strategy title'}
-        url = detail_url(strategy.id)
-        res = self.client.patch(url, payload)
+#         payload = {'title': 'New dashboard title'}
+#         url = detail_url(dashboard.id)
+#         res = self.client.patch(url, payload)
 
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        strategy.refresh_from_db()
-        self.assertEqual(strategy.title, payload['title'])
-        self.assertEqual(strategy.link, original_link)
-        self.assertEqual(strategy.user, self.user)
+#         self.assertEqual(res.status_code, status.HTTP_200_OK)
+#         dashboard.refresh_from_db()
+#         self.assertEqual(dashboard.title, payload['title'])
+#         self.assertEqual(dashboard.link, original_link)
+#         self.assertEqual(dashboard.user, self.user)
 
-    def test_full_update(self):
-        """Test full update of strategy."""
-        strategy = create_strategy(
-            user=self.user,
-            title='Sample strategy title',
-            link='https://exmaple.com/strategy.pdf',
-            description='Sample strategy description.',
-        )
+#     def test_full_update(self):
+#         """Test full update of dashboard."""
+#         dashboard = create_dashboard(
+#             user=self.user,
+#             title='Sample dashboard title',
+#             link='https://exmaple.com/dashboard.pdf',
+#             description='Sample dashboard description.',
+#         )
 
-        payload = {
-            'title': 'New strategy title',
-            'link': 'https://example.com/new-strategy.pdf',
-            'description': 'New strategy description',
-            'time_minutes': 10,
-            'price': Decimal('2.50'),
-        }
-        url = detail_url(strategy.id)
-        res = self.client.put(url, payload)
+#         payload = {
+#             'title': 'New dashboard title',
+#             'link': 'https://example.com/new-dashboard.pdf',
+#             'description': 'New dashboard description',
+#             'time_minutes': 10,
+#             'price': Decimal('2.50'),
+#         }
+#         url = detail_url(dashboard.id)
+#         res = self.client.put(url, payload)
 
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        strategy.refresh_from_db()
-        for k, v in payload.items():
-            self.assertEqual(getattr(strategy, k), v)
-        self.assertEqual(strategy.user, self.user)
+#         self.assertEqual(res.status_code, status.HTTP_200_OK)
+#         dashboard.refresh_from_db()
+#         for k, v in payload.items():
+#             self.assertEqual(getattr(dashboard, k), v)
+#         self.assertEqual(dashboard.user, self.user)
 
-    def test_update_user_returns_error(self):
-        """Test changing the strategy user results in an error."""
-        new_user = create_user(email='user2@example.com', password='test123')
-        strategy = create_strategy(user=self.user)
+#     def test_update_user_returns_error(self):
+#         """Test changing the dashboard user results in an error."""
+#         new_user = create_user(email='user2@example.com', password='test123')
+#         dashboard = create_dashboard(user=self.user)
 
-        payload = {'user': new_user.id}
-        url = detail_url(strategy.id)
-        self.client.patch(url, payload)
+#         payload = {'user': new_user.id}
+#         url = detail_url(dashboard.id)
+#         self.client.patch(url, payload)
 
-        strategy.refresh_from_db()
-        self.assertEqual(strategy.user, self.user)
+#         dashboard.refresh_from_db()
+#         self.assertEqual(dashboard.user, self.user)
 
-    def test_delete_strategy(self):
-        """Test deleting a strategy successful."""
-        strategy = create_strategy(user=self.user)
+#     def test_delete_dashboard(self):
+#         """Test deleting a dashboard successful."""
+#         dashboard = create_dashboard(user=self.user)
 
-        url = detail_url(strategy.id)
-        res = self.client.delete(url)
+#         url = detail_url(dashboard.id)
+#         res = self.client.delete(url)
 
-        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertFalse(Strategy.objects.filter(id=strategy.id).exists())
+#         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+#         self.assertFalse(dashboard.objects.filter(id=dashboard.id).exists())
 
-    def test_strategy_other_users_strategy_error(self):
-        """Test trying to delete another users strategy gives error."""
-        new_user = create_user(email='user2@example.com', password='test123')
-        strategy = create_strategy(user=new_user)
+#     def test_dashboard_other_users_dashboard_error(self):
+#         """Test trying to delete another users dashboard gives error."""
+#         new_user = create_user(email='user2@example.com', password='test123')
+#         dashboard = create_dashboard(user=new_user)
 
-        url = detail_url(strategy.id)
-        res = self.client.delete(url)
+#         url = detail_url(dashboard.id)
+#         res = self.client.delete(url)
 
-        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertTrue(Strategy.objects.filter(id=strategy.id).exists())
-
-
-    def test_create_strategy_with_new_tags(self):
-        """Test creating a strategy with new tags."""
-        payload = {
-            'title': 'Thai Prawn Curry',
-            'time_minutes': 30,
-            'price': Decimal('2.50'),
-            'tags': [{'name': 'Thai'}, {'name': 'Dinner'}],
-        }
-        res = self.client.post(STRATEGY_URL, payload, format='json')
-
-        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        strategys = Strategy.objects.filter(user=self.user)
-        self.assertEqual(strategys.count(), 1)
-        strategy = strategys[0]
-        self.assertEqual(strategy.tags.count(), 2)
-        for tag in payload['tags']:
-            exists = strategy.tags.filter(
-                name=tag['name'],
-                user=self.user,
-            ).exists()
-            self.assertTrue(exists)
+#         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+#         self.assertTrue(dashboard.objects.filter(id=dashboard.id).exists())
 
 
-    def test_create_strategy_with_existing_tags(self):
-        """Test creating a strategy with existing tag."""
-        tag_indian = Tag.objects.create(user=self.user, name='Indian')
-        payload = {
-            'title': 'Pongal',
-            'time_minutes': 60,
-            'price': Decimal('4.50'),
-            'tags': [{'name': 'Indian'}, {'name': 'Breakfast'}],
-        }
-        res = self.client.post(STRATEGY_URL, payload, format='json')
+#     def test_create_dashboard_with_new_tags(self):
+#         """Test creating a dashboard with new tags."""
+#         payload = {
+#             'title': 'Thai Prawn Curry',
+#             'time_minutes': 30,
+#             'price': Decimal('2.50'),
+#             'tags': [{'name': 'Thai'}, {'name': 'Dinner'}],
+#         }
+#         res = self.client.post(dashboard_URL, payload, format='json')
 
-        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        strategys = Strategy.objects.filter(user=self.user)
-        self.assertEqual(strategys.count(), 1)
-        strategy = strategys[0]
-        self.assertEqual(strategy.tags.count(), 2)
-        self.assertIn(tag_indian, strategy.tags.all())
-        for tag in payload['tags']:
-            exists = strategy.tags.filter(
-                name=tag['name'],
-                user=self.user,
-            ).exists()
-            self.assertTrue(exists)
+#         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+#         strategies = dashboard.objects.filter(user=self.user)
+#         self.assertEqual(strategies.count(), 1)
+#         dashboard = strategies[0]
+#         self.assertEqual(dashboard.tags.count(), 2)
+#         for tag in payload['tags']:
+#             exists = dashboard.tags.filter(
+#                 name=tag['name'],
+#                 user=self.user,
+#             ).exists()
+#             self.assertTrue(exists)
 
 
-    def test_create_tag_on_update(self):
-        """Test create tag when updating a strategy."""
-        strategy = create_strategy(user=self.user)
+#     def test_create_dashboard_with_existing_tags(self):
+#         """Test creating a dashboard with existing tag."""
+#         tag_indian = Tag.objects.create(user=self.user, name='Indian')
+#         payload = {
+#             'title': 'Pongal',
+#             'time_minutes': 60,
+#             'price': Decimal('4.50'),
+#             'tags': [{'name': 'Indian'}, {'name': 'Breakfast'}],
+#         }
+#         res = self.client.post(dashboard_URL, payload, format='json')
 
-        payload = {'tags': [{'name': 'Lunch'}]}
-        url = detail_url(strategy.id)
-        res = self.client.patch(url, payload, format='json')
-
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        new_tag = Tag.objects.get(user=self.user, name='Lunch')
-        self.assertIn(new_tag, strategy.tags.all())
-
-    def test_update_strategy_assign_tag(self):
-        """Test assigning an existing tag when updating a strategy."""
-        tag_breakfast = Tag.objects.create(user=self.user, name='Breakfast')
-        strategy = create_strategy(user=self.user)
-        strategy.tags.add(tag_breakfast)
-
-        tag_lunch = Tag.objects.create(user=self.user, name='Lunch')
-        payload = {'tags': [{'name': 'Lunch'}]}
-        url = detail_url(strategy.id)
-        res = self.client.patch(url, payload, format='json')
-
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertIn(tag_lunch, strategy.tags.all())
-        self.assertNotIn(tag_breakfast, strategy.tags.all())
-
-    def test_clear_strategy_tags(self):
-        """Test clearing a strategys tags."""
-        tag = Tag.objects.create(user=self.user, name='Dessert')
-        strategy = create_strategy(user=self.user)
-        strategy.tags.add(tag)
-
-        payload = {'tags': []}
-        url = detail_url(strategy.id)
-        res = self.client.patch(url, payload, format='json')
-
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(strategy.tags.count(), 0)
+#         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+#         strategies = dashboard.objects.filter(user=self.user)
+#         self.assertEqual(strategies.count(), 1)
+#         dashboard = strategies[0]
+#         self.assertEqual(dashboard.tags.count(), 2)
+#         self.assertIn(tag_indian, dashboard.tags.all())
+#         for tag in payload['tags']:
+#             exists = dashboard.tags.filter(
+#                 name=tag['name'],
+#                 user=self.user,
+#             ).exists()
+#             self.assertTrue(exists)
 
 
+#     def test_create_tag_on_update(self):
+#         """Test create tag when updating a dashboard."""
+#         dashboard = create_dashboard(user=self.user)
 
+#         payload = {'tags': [{'name': 'Lunch'}]}
+#         url = detail_url(dashboard.id)
+#         res = self.client.patch(url, payload, format='json')
 
-    def test_create_strategy_with_new_ingredients(self):
-        """Test creating a strategy with new ingredients."""
-        payload = {
-            'title': 'Cauliflower Tacos',
-            'time_minutes': 60,
-            'price': Decimal('4.30'),
-            'ingredients': [{'name': 'Cauliflower'}, {'name': 'Salt'}],
-        }
-        res = self.client.post(STRATEGY_URL, payload, format='json')
+#         self.assertEqual(res.status_code, status.HTTP_200_OK)
+#         new_tag = Tag.objects.get(user=self.user, name='Lunch')
+#         self.assertIn(new_tag, dashboard.tags.all())
 
-        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        strategys = Strategy.objects.filter(user=self.user)
-        self.assertEqual(strategys.count(), 1)
-        strategy = strategys[0]
-        self.assertEqual(strategy.ingredients.count(), 2)
-        for ingredient in payload['ingredients']:
-            exists = strategy.ingredients.filter(
-                name=ingredient['name'],
-                user=self.user,
-            ).exists()
-            self.assertTrue(exists)
+#     def test_update_dashboard_assign_tag(self):
+#         """Test assigning an existing tag when updating a dashboard."""
+#         tag_breakfast = Tag.objects.create(user=self.user, name='Breakfast')
+#         dashboard = create_dashboard(user=self.user)
+#         dashboard.tags.add(tag_breakfast)
 
-    def test_create_strategy_with_existing_ingredient(self):
-        """Test creating a new strategy with existing ingredient."""
-        ingredient = Ingredient.objects.create(user=self.user, name='Lemon')
-        payload = {
-            'title': 'Vietnamese Soup',
-            'time_minutes': 25,
-            'price': '2.55',
-            'ingredients': [{'name': 'Lemon'}, {'name': 'Fish Sauce'}],
-        }
-        res = self.client.post(STRATEGY_URL, payload, format='json')
+#         tag_lunch = Tag.objects.create(user=self.user, name='Lunch')
+#         payload = {'tags': [{'name': 'Lunch'}]}
+#         url = detail_url(dashboard.id)
+#         res = self.client.patch(url, payload, format='json')
 
-        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        strategys = Strategy.objects.filter(user=self.user)
-        self.assertEqual(strategys.count(), 1)
-        strategy = strategys[0]
-        self.assertEqual(strategy.ingredients.count(), 2)
-        self.assertIn(ingredient, strategy.ingredients.all())
-        for ingredient in payload['ingredients']:
-            exists = strategy.ingredients.filter(
-                name=ingredient['name'],
-                user=self.user,
-            ).exists()
-            self.assertTrue(exists)
+#         self.assertEqual(res.status_code, status.HTTP_200_OK)
+#         self.assertIn(tag_lunch, dashboard.tags.all())
+#         self.assertNotIn(tag_breakfast, dashboard.tags.all())
 
-    def test_create_ingredient_on_update(self):
-        """Test creating an ingredient when updating a strategy."""
-        strategy = create_strategy(user=self.user)
+#     def test_clear_dashboard_tags(self):
+#         """Test clearing a strategies tags."""
+#         tag = Tag.objects.create(user=self.user, name='Dessert')
+#         dashboard = create_dashboard(user=self.user)
+#         dashboard.tags.add(tag)
 
-        payload = {'ingredients': [{'name': 'Limes'}]}
-        url = detail_url(strategy.id)
-        res = self.client.patch(url, payload, format='json')
+#         payload = {'tags': []}
+#         url = detail_url(dashboard.id)
+#         res = self.client.patch(url, payload, format='json')
 
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        new_ingredient = Ingredient.objects.get(user=self.user, name='Limes')
-        self.assertIn(new_ingredient, strategy.ingredients.all())
-
-    def test_update_strategy_assign_ingredient(self):
-        """Test assigning an existing ingredient when updating a strategy."""
-        ingredient1 = Ingredient.objects.create(user=self.user, name='Pepper')
-        strategy = create_strategy(user=self.user)
-        strategy.ingredients.add(ingredient1)
-
-        ingredient2 = Ingredient.objects.create(user=self.user, name='Chili')
-        payload = {'ingredients': [{'name': 'Chili'}]}
-        url = detail_url(strategy.id)
-        res = self.client.patch(url, payload, format='json')
-
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertIn(ingredient2, strategy.ingredients.all())
-        self.assertNotIn(ingredient1, strategy.ingredients.all())
-
-    def test_clear_strategy_ingredients(self):
-        """Test clearing a strategys ingredients."""
-        ingredient = Ingredient.objects.create(user=self.user, name='Garlic')
-        strategy = create_strategy(user=self.user)
-        strategy.ingredients.add(ingredient)
-
-        payload = {'ingredients': []}
-        url = detail_url(strategy.id)
-        res = self.client.patch(url, payload, format='json')
-
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(strategy.ingredients.count(), 0)
+#         self.assertEqual(res.status_code, status.HTTP_200_OK)
+#         self.assertEqual(dashboard.tags.count(), 0)
 
 
 
+
+#     def test_create_dashboard_with_new_ingredients(self):
+#         """Test creating a dashboard with new ingredients."""
+#         payload = {
+#             'title': 'Cauliflower Tacos',
+#             'time_minutes': 60,
+#             'price': Decimal('4.30'),
+#             'ingredients': [{'name': 'Cauliflower'}, {'name': 'Salt'}],
+#         }
+#         res = self.client.post(dashboard_URL, payload, format='json')
+
+#         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+#         strategies = dashboard.objects.filter(user=self.user)
+#         self.assertEqual(strategies.count(), 1)
+#         dashboard = strategies[0]
+#         self.assertEqual(dashboard.ingredients.count(), 2)
+#         for ingredient in payload['ingredients']:
+#             exists = dashboard.ingredients.filter(
+#                 name=ingredient['name'],
+#                 user=self.user,
+#             ).exists()
+#             self.assertTrue(exists)
+
+#     def test_create_dashboard_with_existing_ingredient(self):
+#         """Test creating a new dashboard with existing ingredient."""
+#         ingredient = Ingredient.objects.create(user=self.user, name='Lemon')
+#         payload = {
+#             'title': 'Vietnamese Soup',
+#             'time_minutes': 25,
+#             'price': '2.55',
+#             'ingredients': [{'name': 'Lemon'}, {'name': 'Fish Sauce'}],
+#         }
+#         res = self.client.post(dashboard_URL, payload, format='json')
+
+#         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+#         strategies = dashboard.objects.filter(user=self.user)
+#         self.assertEqual(strategies.count(), 1)
+#         dashboard = strategies[0]
+#         self.assertEqual(dashboard.ingredients.count(), 2)
+#         self.assertIn(ingredient, dashboard.ingredients.all())
+#         for ingredient in payload['ingredients']:
+#             exists = dashboard.ingredients.filter(
+#                 name=ingredient['name'],
+#                 user=self.user,
+#             ).exists()
+#             self.assertTrue(exists)
+
+#     def test_create_ingredient_on_update(self):
+#         """Test creating an ingredient when updating a dashboard."""
+#         dashboard = create_dashboard(user=self.user)
+
+#         payload = {'ingredients': [{'name': 'Limes'}]}
+#         url = detail_url(dashboard.id)
+#         res = self.client.patch(url, payload, format='json')
+
+#         self.assertEqual(res.status_code, status.HTTP_200_OK)
+#         new_ingredient = Ingredient.objects.get(user=self.user, name='Limes')
+#         self.assertIn(new_ingredient, dashboard.ingredients.all())
+
+#     def test_update_dashboard_assign_ingredient(self):
+#         """Test assigning an existing ingredient when updating a dashboard."""
+#         ingredient1 = Ingredient.objects.create(user=self.user, name='Pepper')
+#         dashboard = create_dashboard(user=self.user)
+#         dashboard.ingredients.add(ingredient1)
+
+#         ingredient2 = Ingredient.objects.create(user=self.user, name='Chili')
+#         payload = {'ingredients': [{'name': 'Chili'}]}
+#         url = detail_url(dashboard.id)
+#         res = self.client.patch(url, payload, format='json')
+
+#         self.assertEqual(res.status_code, status.HTTP_200_OK)
+#         self.assertIn(ingredient2, dashboard.ingredients.all())
+#         self.assertNotIn(ingredient1, dashboard.ingredients.all())
+
+#     def test_clear_dashboard_ingredients(self):
+#         """Test clearing a strategies ingredients."""
+#         ingredient = Ingredient.objects.create(user=self.user, name='Garlic')
+#         dashboard = create_dashboard(user=self.user)
+#         dashboard.ingredients.add(ingredient)
+
+#         payload = {'ingredients': []}
+#         url = detail_url(dashboard.id)
+#         res = self.client.patch(url, payload, format='json')
+
+#         self.assertEqual(res.status_code, status.HTTP_200_OK)
+#         self.assertEqual(dashboard.ingredients.count(), 0)

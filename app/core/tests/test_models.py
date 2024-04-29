@@ -93,7 +93,7 @@ class ModelTests(TestCase):
         user = create_user()
         dashboard = models.Dashboard.objects.create(
             user=user,
-            gridConfig='Some string'
+            gridConfig='Some string',
+            description='some string'
         )
-
         self.assertEqual(str(dashboard), dashboard.gridConfig)

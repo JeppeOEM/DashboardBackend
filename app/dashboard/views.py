@@ -26,7 +26,7 @@ class DashboardViewSet(viewsets.ModelViewSet):
     ####
     #overwriting get_querset method
     def get_queryset(self):
-        """Retrieve strategys for authenticated user."""
+        """Retrieve strategies for authenticated user."""
         return self.queryset.filter(user=self.request.user).order_by('-id')
 
     #get_serializer_class
