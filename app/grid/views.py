@@ -17,8 +17,8 @@ from grid import serializers
 class GridViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.GridSerializer
     queryset = Grid.objects.all()
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
         #overwriting get_queryset method
     def get_queryset(self):
         """Retrieve strategies for authenticated user."""

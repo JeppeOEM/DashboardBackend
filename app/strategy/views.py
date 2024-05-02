@@ -10,9 +10,11 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 from core.models import (
-    Ingredient,
+    Indicator,
     Strategy,
     Tag,
+    Coin,
+    Base
 )
 from strategy import serializers
 
@@ -23,8 +25,8 @@ class StrategyViewSet(viewsets.ModelViewSet):
     #### take care of typos here
     serializer_class = serializers.StrategyDetailSerializer
     queryset = Strategy.objects.all()
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     ####
     #overwriting get_queryset method
     def get_queryset(self):
@@ -69,14 +71,30 @@ class BaseStrategyAttrViewSet(mixins.DestroyModelMixin,
     # serializer_class = serializers.TagSerializer
     ##### Naming of these variables is not arbitrary it can cause bugs dont the line if there is typos
     # queryset = Tag.objects.all()
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     #####
 
     ### Overwriting method
     def get_queryset(self):
         """Filter queryset to authenticated user."""
         return self.queryset.filter(user=self.request.user).order_by('-name')
+class BaseCoinViewSet(viewsets.ReadOnlyModelViewSet):
+    """Manage base coins in the database."""
+
+
+    # permission_classes = [IsAuthenticated]
+
+    # def get_permissions(self):
+    #     """Return permissions depending on the request method."""
+    #     if self.action in ['list', 'retrieve']:
+    #         # Only allow authenticated users to view the data
+    #         return [IsAuthenticated()]
+    #     return super().get_permissions()
+
+    def get_queryset(self):
+        """Filter queryset to authenticated user."""
+        return self.queryset.order_by('name')
 
 
 class TagViewSet(BaseStrategyAttrViewSet):
@@ -85,7 +103,17 @@ class TagViewSet(BaseStrategyAttrViewSet):
     queryset = Tag.objects.all()
 
 
-class IngredientViewSet(BaseStrategyAttrViewSet):
-    """Manage ingredients in the database."""
-    serializer_class = serializers.IngredientSerializer
-    queryset = Ingredient.objects.all()
+class IndicatorViewSet(BaseStrategyAttrViewSet):
+    """Manage indicators in the database."""
+    serializer_class = serializers.IndicatorSerializer
+    queryset = Indicator.objects.all()
+
+class CoinViewSet(BaseCoinViewSet):
+    """Manage indicators in the database."""
+    serializer_class = serializers.CoinSerializer
+    queryset = Coin.objects.all()
+
+class BaseViewSet(BaseCoinViewSet):
+    """Manage indicators in the database."""
+    serializer_class = serializers.CoinSerializer
+    queryset = Base.objects.all()

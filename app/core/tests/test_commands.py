@@ -19,15 +19,12 @@ class CommandTests(SimpleTestCase):
     def test_wait_for_db_ready(self, patched_check):
         """Test waiting for database if database ready."""
         patched_check.return_value = True
-
-
         call_command('wait_for_db')
-
         patched_check.assert_called_once_with(databases=['default'])
 
     #replace build sleep function with mock object, to overwrite the sleep behaviour so we just run the code faster
     @patch('time.sleep')
-    #must be in correct order, adds decorators inside out first time.sleep then @path('core....) 
+    #must be in correct order, adds decorators inside out first time.sleep then @path('core....)
     def test_wait_for_db_delay(self, patched_sleep, patched_check):
         """Test waiting for database when getting OperationalError."""
         #First to times it raises the error, then after it raises 3 operational errors

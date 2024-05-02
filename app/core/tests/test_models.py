@@ -77,15 +77,15 @@ class ModelTests(TestCase):
 
         self.assertEqual(str(tag), tag.name)
 
-    def test_create_ingredient(self):
-        """Test creating an ingredient is successful."""
+    def test_create_indicator(self):
+        """Test creating an indicator is successful."""
         user = create_user()
-        ingredient = models.Ingredient.objects.create(
+        indicator = models.Indicator.objects.create(
             user=user,
-            name='Ingredient1'
+            name='Indicator1'
         )
 
-        self.assertEqual(str(ingredient), ingredient.name)
+        self.assertEqual(str(indicator), indicator.name)
 
 
     def test_create_dashboard(self):
@@ -97,3 +97,4 @@ class ModelTests(TestCase):
             description='some string'
         )
         self.assertEqual(str(dashboard), dashboard.gridConfig)
+

@@ -5,12 +5,29 @@ from rest_framework import serializers
 from core.models import (
     Strategy,
     Tag,
-    Ingredient,
+    Indicator,
+    Coin,
+    Base
 )
-class IngredientSerializer(serializers.ModelSerializer):
-    """Serializer for ingredients."""
+
+class BaseSerializer(serializers.ModelSerializer):
+    """Serializer for indicators."""
     class Meta:
-        model = Ingredient
+        model = Base
+        fields = ['id', 'name']
+        read_only_fields = ['id']
+
+class CoinSerializer(serializers.ModelSerializer):
+    """Serializer for indicators."""
+    class Meta:
+        model = Coin
+        fields = ['id', 'name']
+        read_only_fields = ['id']
+
+class IndicatorSerializer(serializers.ModelSerializer):
+    """Serializer for indicators."""
+    class Meta:
+        model = Indicator
         fields = ['id', 'name']
         read_only_fields = ['id']
 class TagSerializer(serializers.ModelSerializer):
@@ -22,13 +39,12 @@ class TagSerializer(serializers.ModelSerializer):
 class StrategySerializer(serializers.ModelSerializer):
     """Serializer for strategies."""
     tags = TagSerializer(many=True, required=False)
-    ingredients = IngredientSerializer(many=True, required=False)
+    indicators = IndicatorSerializer(many=True, required=False)
 
     class Meta:
         model = Strategy
         fields = [
-            'id', 'title', 'time_minutes', 'price', 'link', 'tags',
-            'ingredients',
+            'id', 'base', 'coins', 'tags', 'indicators',
         ]
         read_only_fields = ['id']
 
@@ -42,23 +58,23 @@ class StrategySerializer(serializers.ModelSerializer):
             )
             strategy.tags.add(tag_obj)
 
-    def _get_or_create_ingredients(self, ingredients, strategy):
-        """Handle getting or creating ingredients as needed."""
+    def _get_or_create_indicators(self, indicators, strategy):
+        """Handle getting or creating indicators as needed."""
         auth_user = self.context['request'].user
-        for ingredient in ingredients:
-            ingredient_obj, created = Ingredient.objects.get_or_create(
+        for indicator in indicators:
+            indicator_obj, created = Indicator.objects.get_or_create(
                 user=auth_user,
-                **ingredient,
+                **indicator,
             )
-            strategy.ingredients.add(ingredient_obj)
+            strategy.indicators.add(indicator_obj)
 
     def create(self, validated_data):
         """Create a strategy."""
         tags = validated_data.pop('tags', [])
-        ingredients = validated_data.pop('ingredients', [])
+        indicators = validated_data.pop('indicators', [])
         strategy = Strategy.objects.create(**validated_data)
         self._get_or_create_tags(tags, strategy)
-        self._get_or_create_ingredients(ingredients, strategy)
+        self._get_or_create_indicators(indicators, strategy)
 
         return strategy
 
@@ -76,13 +92,13 @@ class StrategySerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         """Update strategy."""
         tags = validated_data.pop('tags', None)
-        ingredients = validated_data.pop('ingredients', None)
+        indicators = validated_data.pop('indicators', None)
         if tags is not None:
             instance.tags.clear()
             self._get_or_create_tags(tags, instance)
-        if ingredients is not None:
-            instance.ingredients.clear()
-            self._get_or_create_ingredients(ingredients, instance)
+        if indicators is not None:
+            instance.indicators.clear()
+            self._get_or_create_indicators(indicators, instance)
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)

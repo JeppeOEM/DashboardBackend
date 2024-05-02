@@ -12,7 +12,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from core.models import (
-    Ingredient,
+    Indicator,
     Strategy,
     Tag,
 )
@@ -40,7 +40,6 @@ def create_strategy(user, **params):
         'time_minutes': 22,
         'price': Decimal('5.25'),
         'description': 'Sample description',
-        'link': 'http://example.com/strategy.pdf',
     }
     defaults.update(params)
 
@@ -304,13 +303,13 @@ class PrivateStrategyApiTests(TestCase):
 
 
 
-    def test_create_strategy_with_new_ingredients(self):
-        """Test creating a strategy with new ingredients."""
+    def test_create_strategy_with_new_indicators(self):
+        """Test creating a strategy with new indicators."""
         payload = {
             'title': 'Cauliflower Tacos',
             'time_minutes': 60,
             'price': Decimal('4.30'),
-            'ingredients': [{'name': 'Cauliflower'}, {'name': 'Salt'}],
+            'indicators': [{'name': 'Cauliflower'}, {'name': 'Salt'}],
         }
         res = self.client.post(STRATEGY_URL, payload, format='json')
 
@@ -318,22 +317,22 @@ class PrivateStrategyApiTests(TestCase):
         strategies = Strategy.objects.filter(user=self.user)
         self.assertEqual(strategies.count(), 1)
         strategy = strategies[0]
-        self.assertEqual(strategy.ingredients.count(), 2)
-        for ingredient in payload['ingredients']:
-            exists = strategy.ingredients.filter(
-                name=ingredient['name'],
+        self.assertEqual(strategy.indicators.count(), 2)
+        for indicator in payload['indicators']:
+            exists = strategy.indicators.filter(
+                name=indicator['name'],
                 user=self.user,
             ).exists()
             self.assertTrue(exists)
 
-    def test_create_strategy_with_existing_ingredient(self):
-        """Test creating a new strategy with existing ingredient."""
-        ingredient = Ingredient.objects.create(user=self.user, name='Lemon')
+    def test_create_strategy_with_existing_indicator(self):
+        """Test creating a new strategy with existing indicator."""
+        indicator = Indicator.objects.create(user=self.user, name='Lemon')
         payload = {
             'title': 'Vietnamese Soup',
             'time_minutes': 25,
             'price': '2.55',
-            'ingredients': [{'name': 'Lemon'}, {'name': 'Fish Sauce'}],
+            'indicators': [{'name': 'Lemon'}, {'name': 'Fish Sauce'}],
         }
         res = self.client.post(STRATEGY_URL, payload, format='json')
 
@@ -341,54 +340,54 @@ class PrivateStrategyApiTests(TestCase):
         strategies = Strategy.objects.filter(user=self.user)
         self.assertEqual(strategies.count(), 1)
         strategy = strategies[0]
-        self.assertEqual(strategy.ingredients.count(), 2)
-        self.assertIn(ingredient, strategy.ingredients.all())
-        for ingredient in payload['ingredients']:
-            exists = strategy.ingredients.filter(
-                name=ingredient['name'],
+        self.assertEqual(strategy.indicators.count(), 2)
+        self.assertIn(indicator, strategy.indicators.all())
+        for indicator in payload['indicators']:
+            exists = strategy.indicators.filter(
+                name=indicator['name'],
                 user=self.user,
             ).exists()
             self.assertTrue(exists)
 
-    def test_create_ingredient_on_update(self):
-        """Test creating an ingredient when updating a strategy."""
+    def test_create_indicator_on_update(self):
+        """Test creating an indicator when updating a strategy."""
         strategy = create_strategy(user=self.user)
 
-        payload = {'ingredients': [{'name': 'Limes'}]}
+        payload = {'indicators': [{'name': 'Limes'}]}
         url = detail_url(strategy.id)
         res = self.client.patch(url, payload, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        new_ingredient = Ingredient.objects.get(user=self.user, name='Limes')
-        self.assertIn(new_ingredient, strategy.ingredients.all())
+        new_indicator = Indicator.objects.get(user=self.user, name='Limes')
+        self.assertIn(new_indicator, strategy.indicators.all())
 
-    def test_update_strategy_assign_ingredient(self):
-        """Test assigning an existing ingredient when updating a strategy."""
-        ingredient1 = Ingredient.objects.create(user=self.user, name='Pepper')
+    def test_update_strategy_assign_indicator(self):
+        """Test assigning an existing indicator when updating a strategy."""
+        indicator1 = Indicator.objects.create(user=self.user, name='Pepper')
         strategy = create_strategy(user=self.user)
-        strategy.ingredients.add(ingredient1)
+        strategy.indicators.add(indicator1)
 
-        ingredient2 = Ingredient.objects.create(user=self.user, name='Chili')
-        payload = {'ingredients': [{'name': 'Chili'}]}
+        indicator2 = Indicator.objects.create(user=self.user, name='Chili')
+        payload = {'indicators': [{'name': 'Chili'}]}
         url = detail_url(strategy.id)
         res = self.client.patch(url, payload, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertIn(ingredient2, strategy.ingredients.all())
-        self.assertNotIn(ingredient1, strategy.ingredients.all())
+        self.assertIn(indicator2, strategy.indicators.all())
+        self.assertNotIn(indicator1, strategy.indicators.all())
 
-    def test_clear_strategy_ingredients(self):
-        """Test clearing a strategies ingredients."""
-        ingredient = Ingredient.objects.create(user=self.user, name='Garlic')
+    def test_clear_strategy_indicators(self):
+        """Test clearing a strategies indicators."""
+        indicator = Indicator.objects.create(user=self.user, name='Garlic')
         strategy = create_strategy(user=self.user)
-        strategy.ingredients.add(ingredient)
+        strategy.indicators.add(indicator)
 
-        payload = {'ingredients': []}
+        payload = {'indicators': []}
         url = detail_url(strategy.id)
         res = self.client.patch(url, payload, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(strategy.ingredients.count(), 0)
+        self.assertEqual(strategy.indicators.count(), 0)
 
 
 

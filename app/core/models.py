@@ -10,7 +10,19 @@ from django.contrib.auth.models import (
 )
 
 
+class Coin(models.Model):
+    """Model for representing a coin."""
+    name = models.CharField(max_length=255)
+    # Other fields related to Coin model
+    def __str__(self):
+        return self.name
 
+class Base(models.Model):
+    """Model for representing a base currency."""
+    name = models.CharField(max_length=255)
+    # Other fields related to Coin model
+    def __str__(self):
+        return self.name
 
 
 class UserManager(BaseUserManager):
@@ -52,19 +64,22 @@ class Strategy(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
-    title = models.CharField(max_length=255)
+    base = models.ForeignKey(
+        Coin,
+        related_name='base_strategies',
+        on_delete=models.CASCADE,
+        null=True
+    )
+    coins = models.ManyToManyField('Coin')
     description = models.TextField(blank=True)
-    time_minutes = models.IntegerField()
-    price = models.DecimalField(max_digits=5, decimal_places=2)
-    link = models.CharField(max_length=255, blank=True)
     tags = models.ManyToManyField('Tag')
-    ingredients = models.ManyToManyField('Ingredient')
+    indicators = models.ManyToManyField('Indicator')
 
     def __str__(self):
         return self.title
 
 class Grid(models.Model):
-    """Ingredient for strategies."""
+    """Indicator for strategies."""
     gridConfig = models.TextField()
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -77,7 +92,7 @@ class Grid(models.Model):
 
 
 class Dashboard(models.Model):
-    """Ingredient for strategies."""
+    """Indicator for strategies."""
     gridConfig = models.TextField()
     gridConfig2 = models.TextField()
     gridConfig3 = models.TextField()
@@ -101,8 +116,8 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 
-class Ingredient(models.Model):
-    """Ingredient for strategies."""
+class Indicator(models.Model):
+    """Indicator for strategies."""
     name = models.CharField(max_length=255)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

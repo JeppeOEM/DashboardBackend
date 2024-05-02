@@ -18,7 +18,9 @@ router = DefaultRouter()
 #auto generated endpoints from the view
 router.register('strategies', views.StrategyViewSet)
 router.register('tags', views.TagViewSet)
-router.register('ingredients', views.IngredientViewSet)
+router.register('indicators', views.IndicatorViewSet)
+router.register('coins', views.CoinViewSet)
+router.register('bases', views.BaseViewSet)
 
 app_name = 'strategy'
 
