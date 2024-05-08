@@ -62,6 +62,7 @@ MIDDLEWARE = [
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = (
   'http://localhost:5173',
+  'http://localhost:5174',
 )
 
 ROOT_URLCONF = 'app.urls'
