@@ -20,10 +20,12 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Checkout
         # provided for free by GitHub, it gives ACCESS to the code
-        uses: actions/checkout@v2
+        uses:
+          actions/checkout@v2
+          # run: export RTE=dev;docker-compose run --rm app sh -c "python manage.py wait_for_db && python manage.py test"
       - name: Coverage
         # run: export RTE=dev;docker-compose run --rm app sh -c "coverage run --source="." --omit=manage.py manage.py test --verbosity 2 coverage report -m --fail-under=80"
-        run: export RTE=dev;docker-compose run --rm app sh -c "coverage run --source='.' --omit=manage.py manage.py test --verbosity 2 && coverage report -m --fail-under=80"
+        run: export RTE=dev;docker-compose run --rm app sh -c "coverage run --source='.' --omit=python manage.py wait_for_db && manage.py manage.py test --verbosity 2 && coverage report -m --fail-under=80"
 
       - name: Lint
         run: docker-compose run --rm app sh -c "flake8"
