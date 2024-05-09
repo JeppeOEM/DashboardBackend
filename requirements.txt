@@ -7,3 +7,4 @@ python-binance
 pandas
 numpy
 pip-audit
+coverage
