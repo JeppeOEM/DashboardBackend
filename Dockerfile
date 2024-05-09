@@ -11,7 +11,7 @@ COPY ./app /app
 WORKDIR /app
 EXPOSE 8000
 
-ARG DEV="test"
+ARG DEV="dev"
 RUN python -m venv /py
 RUN /py/bin/pip install --upgrade pip
 RUN apk add --update --no-cache postgresql-client && \
