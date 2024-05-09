@@ -11,14 +11,14 @@ COPY ./app /app
 WORKDIR /app
 EXPOSE 8000
 
-ARG DEV=test
+ARG DEV="test"
 RUN python -m venv /py
 RUN /py/bin/pip install --upgrade pip
 RUN apk add --update --no-cache postgresql-client && \
     apk add --update --no-cache --virtual .tmp-build-deps \
     build-base postgresql-dev musl-dev
 RUN /py/bin/pip install -r /tmp/requirements.txt && \
-    if [ $DEV = "true" ]; \
+    if [ $DEV = "test" ]; \
     then /py/bin/pip install -r /tmp/requirements.dev.txt ; \
     fi
 RUN rm -rf /tmp && \
