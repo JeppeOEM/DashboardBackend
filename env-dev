@@ -1,3 +1,4 @@
+RTE=dev
 DB_HOST=db
 DB_NAME=devdb
 DB_USER=devuser

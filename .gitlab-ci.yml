@@ -1,0 +1,39 @@
+---
+stages:
+  - static
+  - build
+
+static:
+  stage: static
+  image: python:3.10-alpine
+  before_script:
+    - pip install --upgrade pip
+    - pip install -r sqa-requirements.txt
+    - apk update && apk add shellcheck
+  script:
+    - pylama --options .pylama.ini .
+    # - djlint . used for html files and we dont have any
+    - pip-audit
+    - yamllint *.yml
+    - shellcheck *.sh
+
+build:
+  stage: build
+  #allows us to run docker inside docker
+  image: registry.gitlab.com/henrikstroem/composer:latest
+
+  # docker:dind: This service provides Docker-in-Docker (DinD) functionality.
+  # DinD allows you to run Docker commands within a Docker container,
+  # enabling you to build and manage Docker images from within your CI/CD pipeline.
+  # This is particularly useful when your CI/CD jobs need to interact with Docker,
+  # such as building Docker images or running Dockerized applications for testing.
+  services:
+    - docker:dind
+  variables:
+    DOCKER_DRIVER: overlay2
+  before_script:
+    - docker login -u gitlab-ci-token -p "$GITLAB_CI_TOKEN" "$CI_REGISTRY"
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/app:latest" .
+    - docker push "$CI_REGISTRY_IMAGE/app:latest"
+    - RTE=test docker-compose up --abort-on-container-exit --exit-code-from app

@@ -1,15 +1,10 @@
-# Git
-.git
+README.md
 .gitignore
-
-# Docker
-.docker
-
-# Python
-app/__pycache__/
-app/*/__pycache__/
-app/*/*/__pycache__/
-app/*/*/*/__pycache__/
-.env/
-.venv/
-venv/
+.git/
+Dockerfile
+*.swp
+.DS_Store
+*.pyc
+__pycache__/
+db.sqlite3
+.coverage

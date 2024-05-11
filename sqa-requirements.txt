@@ -1,0 +1,8 @@
+
+pylama
+djlint
+pip-audit
+yamllint
+coverage
+isort
+autopep8

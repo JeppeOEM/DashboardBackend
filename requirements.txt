@@ -6,5 +6,5 @@ django-cors-headers
 python-binance
 pandas
 numpy
-pip-audit
-coverage
+setuptools>=65.5.1
+wheel>=0.38.1

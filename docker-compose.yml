@@ -1,45 +1,31 @@
-version: "3.9"
-
+version: '3.9'
 services:
-
-  app:
-    build:
-    #build in current directory where are running docker compose from
-      context: .
-      args:
-        - DEV=true
-    ports:
-      - "8000:8000"
+  nginx:
+    image: 'nginx:latest'
     volumes:
-    #sync code
-      - ./app:/app
-      #if no command is specified in docker compose run it will use this command specified in "command"
-    # command: ./setup.sh
-    command: ./setup
+      - './nginx/:/etc/nginx/conf.d/'
+    ports:
+      - '8000:8000'
+    depends_on:
+      - app
+  app:
+    # build:
+    #   context: .
 
-    environment:
-      - RTE=test
-    #because using docker compose it is possible to use the name of the servie as the hostname
-      # - DB_HOST=db
-      # - DB_NAME=devdb
-      # - DB_USER=devuser
-      # - DB_PASS=changeme
-    #wait for db service to start before app runs
+    image: registry.gitlab.com/onur2660/dockerized-django/app:latest
+    # image: app:latest
+    volumes:
+      - '.:/app'
+    command: ls -a
     env_file:
       - env-$RTE
     depends_on:
-      - db #only ensures db is started not that postgres is running and ready
-
+      - db
   db:
-    image: postgres:13-alpine
+    image: 'postgres:13-alpine'
     volumes:
-      - dev-db-data:/var/lib/postgresql/data
+      - 'dev-db-data:/var/lib/postgresql/data'
     env_file:
       - env-$RTE
-    # environment:
-    #   - POSTGRES_DB=devdb
-    #   - POSTGRES_USER=devuser
-    #   - POSTGRES_PASSWORD=changeme
-
 volumes:
-  dev-db-data:
+  dev-db-data: null
